@@ -1,6 +1,8 @@
 import { of } from "rxjs";
-import { Observable, interval, range} from 'rxjs';
-import { toArray, flatMap, map } from 'rxjs/operators';
+import { combineLatest, Observable, fromEvent, interval, range} from 'rxjs';
+import { toArray, flatMap, map, scan, sampleTime, startWith } from 'rxjs/operators';
+
+// import './hero_1';
 
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
@@ -19,6 +21,7 @@ function paintStars(stars) {
 
 const SPEED = 40;
 const STAR_NUMBER = 250;
+
 const StarStream$ = range(1, STAR_NUMBER).pipe(
   map(() => ({
     x: parseInt(Math.random() * canvas.width, 10),
@@ -38,4 +41,77 @@ const StarStream$ = range(1, STAR_NUMBER).pipe(
       return starArray;
     })
   ))
-).subscribe(paintStars);
+);
+
+// hero_1.js
+const HERO_Y = canvas.height - 30;
+
+function drawTriangle(x, y, width, color, direction) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x - width, y);
+  ctx.lineTo(x, direction === 'up' ? y - width : y + width);
+  ctx.lineTo(x + width, y);
+  ctx.lineTo(x - width, y);
+  ctx.fill();
+}
+
+function paintSpaceShip(x, y) {
+  drawTriangle(x, y, 20, '#ff0000', 'up');
+}
+
+const SpaceShip$ = fromEvent(canvas, 'mousemove').pipe(
+  map(event => ({
+    x: event.clientX,
+    y: HERO_Y
+  })),
+  startWith({
+      x: canvas.width / 2,
+      y: HERO_Y
+    })
+  );
+
+//enemy_1.js
+
+const ENEMY_FREQ = 1500;
+const Enemies$ = interval(ENEMY_FREQ).pipe(
+  scan(enemyArray => {
+    const enemy = {
+      x: parseInt(Math.random() * canvas.width, 10),
+      y: -30
+    }
+
+    enemyArray.push(enemy);
+    return enemyArray;
+  }, [])
+);
+
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min - 1)) + min;
+}
+
+function paintEnemies(enemies) {
+  enemies.forEach(enemy => {
+    enemy.y += 5;
+    enemy.x += getRandomInt(-15, 15);
+
+    drawTriangle(enemy.x, enemy.y, 20, "#00ff00", "down");
+  })
+}
+const Game = combineLatest(
+  StarStream$,
+  SpaceShip$,
+  Enemies$,
+  (stars, spaceship, enemies) => ({stars, spaceship, enemies})
+);
+
+function renderScene(actors) {
+  paintStars(actors.stars);
+  paintSpaceShip(actors.spaceship.x, actors.spaceship.y);
+  paintEnemies(actors.enemies);
+}
+
+Game.pipe(sampleTime(SPEED)).subscribe(renderScene);
+
+// hero_shots.js
+// TOOD
