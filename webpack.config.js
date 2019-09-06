@@ -1,3 +1,4 @@
+const glob = require("glob");
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = (env) => ({
