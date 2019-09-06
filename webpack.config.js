@@ -1,8 +1,9 @@
 const glob = require("glob");
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = (env) => ({
-  devtool: env.dev ? 'inline-source-map' : 'source-map',
+  devtool: env.dev ? 'inline-source-map' : false,
   entry: './src/index.js',
   module: {
     rules: [
@@ -20,6 +21,7 @@ module.exports = (env) => ({
     filename: 'index_bundle.js'
   },
   plugins: [
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       title: 'Reactive Space Game',
       template: './src/index.html'

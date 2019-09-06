@@ -7,6 +7,8 @@
     "@babel/preset-env": "^7.5.5",
     "babel-loader": "^8.0.6",
     "babel-polyfill": "^6.23.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "gh-pages": "^2.1.1",
     "glob": "^7.1.4",
     "html-webpack-plugin": "^3.2.0",
     "webpack": "^4.39.3",
@@ -16,6 +18,7 @@
   "dependencies": {
     "rxjs": "^6.5.2"
   },
+  "homepage": "https://dwightgunning.github.io/reactive-space-game/",
   "license": "MIT",
   "main": "index.js",
   "name": "reactive-space-game",
@@ -23,7 +26,8 @@
   "repository": "https://github.com/dwightgunning/reactive-space-game",
   "scripts": {
     "build": "webpack",
-    "start": "webpack-dev-server --env.dev"
+    "start": "webpack-dev-server --env.dev",
+    "deploy": "webpack --env.prod -p && gh-pages -d dist"
   },
   "version": "0.0.1"
 }
